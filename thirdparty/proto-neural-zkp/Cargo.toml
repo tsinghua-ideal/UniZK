@@ -1,0 +1,81 @@
+[package]
+name = "neural-zkp"
+version = "0.1.0"
+edition="2021"
+description = "A bunch of helpful ligence and zero knowledge"
+repository = "https://github.com/dcbuild3r/proto-neural-zkp/"
+readme = "README.md"
+keywords = ["zero knowledge", "ML", "neural network"]
+categories = ["cryptography tooling"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+default = []
+bench = [ "criterion", "proptest" ]
+
+[[bin]]
+name = "rust-app"
+path = "src/cli/main.rs"
+
+[[bench]]
+name = "criterion"
+harness = false
+path = "criterion.rs"
+required-features = [ "bench", "proptest" ]
+
+[dependencies]
+anyhow = "1.0.53"
+auto_impl = "1.0.1"
+bytesize = "1.1.0"
+color-eyre = "0.6"
+criterion = { version = "0.3", optional = true, features = [ "async_tokio" ] }
+erased-serde = "0.3"
+eyre = "0.6"
+futures = "0.3"
+itertools = "0.10"
+mimalloc = { version = "0.1", default-features = false, optional = true }
+num_cpus = "1.13"
+once_cell = "1.8"
+proptest = { version = "1.0", optional = true }
+rand = "0.8.4"
+rand_pcg = "0.3.1"
+rayon = "1.5.1"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.85"
+serde_cbor = "0.11.1"
+structopt = "0.3"
+thiserror = "1.0"
+tokio = { version = "1.15", features = [ "signal", "macros", "rt", "sync", "time", "rt-multi-thread", "tracing" ] }
+tracing = "0.1"
+tracing-futures = "0.2"
+tracing-log = "0.1.2"
+tracing-subscriber = { version = "0.3", features = [ "env-filter", "json" ] }
+tracing-test = "0.2"
+log = "0.4.14"
+ndarray = {version = "0.15.4", features = ["serde"]}
+ndarray-rand = "0.14.0"
+ndarray-stats = " 0.5.0"
+rand_isaac = "0.3.0"
+plonky2 = { path = "../plonky2/plonky2" }
+env_logger = "0.10.0"
+
+[dev-dependencies]
+proptest = { version = "1.0" }
+tempfile = "3.0"
+
+[build-dependencies]
+eyre = "0.6"
+time = { version = "0.3.5", features = [ "formatting", "parsing" ] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"
+overflow-checks = true
+
+# Compilation profile for any non-workspace member.
+# Dependencies are optimized, even in a dev build. This improves dev performance
+# while having neglible impact on incremental build times.
+[profile.dev.package."*"]
+opt-level = 3

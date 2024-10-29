@@ -1,0 +1,28 @@
+Frontend:
+  impl: RamSim
+  maxPendEntry: 16
+  enableLogging: True
+
+MemorySystem:
+  impl: GenericDRAM
+  clock_ratio: 3
+
+  DRAM:
+    impl: DDR4
+    org:
+      preset: DDR4_8Gb_x8
+      channel: 4
+      rank: 2
+    timing:
+      preset: DDR4_2400R 
+
+  Controller:
+    impl: Generic
+    Scheduler:
+      impl: FRFCFS
+    RefreshManager:
+      impl: AllBank
+    plugins:
+
+  AddrMapper:
+    impl: RoBaRaCoCh

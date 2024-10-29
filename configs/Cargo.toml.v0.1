@@ -1,0 +1,23 @@
+[package]
+name = "unizk"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+plonky2 = {path = "./thirdparty/plonky2v0.1/plonky2"}
+starky = {path = "./thirdparty/plonky2v0.1/starky"}
+maybe_rayon = { path = "./thirdparty/plonky2v0.1/maybe_rayon" }
+plonky2_ecdsa = { path = "./thirdparty/plonky2v0.1/ecdsa" }
+plonky2_field = { path = "./thirdparty/plonky2v0.1/field" }
+plonky2_sha256 = {path = "./thirdparty/sha256"}
+num = { version = "0.4", default-features = false, features = ["rand"] }
+rand = "0.8"
+log = "0.4"
+env_logger = "0.9"
+anyhow = { version = "1.0.40", default-features = false }
+clap = "4.1.8"
+sha2 = "0.10"
+image = "0.24.5"
+zkedit-zkp = { path = "./thirdparty/imgcrop" }

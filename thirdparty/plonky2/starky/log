@@ -1,0 +1,8 @@
+
+running 1 test
+AES output: [66, e9, 4b, d4, ef, 8a, 2c, 3b, 88, 4c, fa, 59, ca, 34, 2b, 2e]
+AES trace output: [66, e9, 4b, d4, ef, 8a, 2c, 3b, 88, 4c, fa, 59, ca, 34, 2b, 2e]
+test aes128::generation::tests::test_zero_key_and_zero_input ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.02s
+

@@ -1,0 +1,32 @@
+Frontend:
+  impl: TraceGen
+  clock_ratio: 1
+  traceFileName: /scorpio/home/wangcheng/RamSim/run_template/cpu.bin
+  Frontend:
+    impl: RamSim
+    maxPendEntry: 16
+    enableLogging: True
+
+MemorySystem:
+  impl: GenericDRAM
+  clock_ratio: 5
+
+  DRAM:
+    impl: DDR4
+    org:
+      preset: DDR4_8Gb_x8
+      channel: 4
+      rank: 2
+    timing:
+      preset: DDR4_2400R 
+
+  Controller:
+    impl: Generic
+    Scheduler:
+      impl: FRFCFS
+    RefreshManager:
+      impl: AllBank
+    plugins:
+
+  AddrMapper:
+    impl: RoBaRaCoCh

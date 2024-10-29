@@ -1,0 +1,18 @@
+[package]
+name = "zkedit-zkp"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+plonky2 = { path = "../plonky2v0.1/plonky2", features = ["parallel", "timing"] }
+plonky2_util = { path = "../plonky2v0.1/util" }
+plonky2_field = { path = "../plonky2v0.1/field" }
+plonky2_u32 = { path = "../plonky2v0.1/u32" }
+
+itertools = "0.10.5"
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0.40"
+log = "0.4.14"
+env_logger = "0.9.0"

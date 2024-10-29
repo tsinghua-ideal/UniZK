@@ -1,0 +1,34 @@
+Frontend:
+  impl: TraceGen
+  clock_ratio: 10
+  traceFileName: ./traces/sha256_starky_recursive.bin
+  Frontend:
+    impl: RamSim
+    maxPendEntry: 16
+    enableLogging: False
+
+  Translation:
+    impl: NoTranslation
+    max_addr: 2147483648
+
+MemorySystem:
+  impl: GenericDRAM
+  clock_ratio: 10
+  DRAM:
+    impl: HBM2
+    org:
+      preset: HBM2_4Gb
+      channel: 128
+    timing:
+      preset: HBM2_2Gbps
+
+  Controller:
+    impl: Generic
+    Scheduler:
+      impl: FRFCFS
+    RefreshManager:
+      impl: AllBank
+    plugins:
+
+  AddrMapper:
+    impl: RoBaRaCoCh
