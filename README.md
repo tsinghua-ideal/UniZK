@@ -14,7 +14,7 @@ We appreciate the contributions of these open-source authors.
 ## How to get started
 ### Prerequiste
 - rust 1.80
-- g++-12
+- g++ 11.4
 - cmake 3.22
 
 ### Use a nightly toolchain for Plonky2
