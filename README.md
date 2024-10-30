@@ -41,3 +41,6 @@ make -j
 ```
 
 A log file with the name of the application, such as “sha256.log”, will appear in the folder with the simulation results.
+
+## Hint
+Trace files can take up a lot of disk space. Ensure you have enough space when testing large applications and remember to clean up the files after testing!
