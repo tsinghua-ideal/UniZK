@@ -17,6 +17,11 @@ We appreciate the contributions of these open-source authors.
 - g++-12
 - cmake 3.22
 
+### Use a nightly toolchain for Plonky2
+```
+rustup override set nightly
+```
+
 ### Build Ramulator2
 ```
 cd thirdparty/ramulator2
