@@ -71,7 +71,7 @@ impl RamConfig {
 
         Self {
             file_name: file_name.to_string(),
-            excutable_path: "./thirdparty/ramulator2/build/ramulator2".to_string(),
+            excutable_path: "./thirdparty/ramsim/build/ramulator2".to_string(),
             config_path: "./configs/".to_string() + file_name + ".yaml",
             burst_length: 64, //bytes
             num_current_ops: 0,

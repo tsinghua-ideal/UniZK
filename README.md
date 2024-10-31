@@ -5,7 +5,8 @@ The codes of the following third-party libraries are sourced from:
 - imgcrop: <https://github.com/ChickenLover/plonky2-zkedit>
 - plonky2: <https://github.com/0xPolygonZero/plonky2>
 - proto-neural-zkp: <https://github.com/worldcoin/proto-neural-zkp>
-- ramulator2: <https://github.com/CMU-SAFARI/ramulator2>
+- ramsim: RamSim is an enhanced version of Ramulator2, adding support for simulating computation latency and data dependencies. Most of its source code is derived from <https://github.com/CMU-SAFARI/ramulator2>.
+
 - sha256: <https://github.com/polymerdao/plonky2-sha256>
 - sha256-starky: <https://github.com/tumberger/plonky2/tree/sha256-starky>
 
@@ -22,9 +23,9 @@ We appreciate the contributions of these open-source authors.
 rustup override set nightly
 ```
 
-### Build Ramulator2
+### Build RamSim
 ```
-cd thirdparty/ramulator2
+cd thirdparty/ramsim
 mkdir build
 cd build
 cmake ..
