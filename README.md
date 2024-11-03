@@ -53,4 +53,4 @@ A log file with the name of the application, such as “sha256.log”, will appe
 Trace files can take up a lot of disk space. Ensure you have enough space when testing large applications and remember to clean up the files after testing!
 
 ### GPU
-The GPU performance can be evaluated using the GPU implementation of Plonky2 (available at <https://github.com/sideprotocol/plonky2-gpu>) with our CPU-based application code located in the `examples` directory.
+The GPU performance can be evaluated using the GPU implementation of Plonky2 (available at <https://github.com/sideprotocol/plonky2-gpu/tree/d6430874ae76e6cfc45d995fa3cf8b84fad70404>) with our CPU-based application code located in the `examples` directory.
