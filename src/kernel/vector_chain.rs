@@ -404,7 +404,7 @@ impl Kernel for VectorChain {
         self.write_request.clone()
     }
     fn log(&self) {
-        // info!("VectorChain: {:?}", self.vec_ops);
+        // debug!("VectorChain: {:?}", self.vec_ops);
     }
     fn get_kernel_type(&self) -> String {
         String::from("Vector")
@@ -447,7 +447,7 @@ impl VectorChain {
             num_preload_elems: mem.num_preload_elems,
         };
 
-        if unsafe { !ENABLE_CONFIG.poly } {
+        if unsafe { !ENABLE_CONFIG.other } {
             return k;
         }
 

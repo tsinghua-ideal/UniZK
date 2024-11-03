@@ -7,7 +7,7 @@ use crate::plonk::vars::EvaluationVarsBaseBatch;
 use crate::plonk::zero_poly_coset::ZeroPolyOnCoset;
 use crate::system::system::System;
 use crate::util::{ceil_div_usize, SIZE_F};
-use log::info;
+use log::debug;
 use plonky2::field::extension::Extendable;
 use plonky2::hash::hash_types::RichField;
 use plonky2::plonk::circuit_data::CommonCircuitData;
@@ -31,7 +31,7 @@ pub fn eval_vanishing_poly_base_batch<F: RichField + Extendable<D>, const D: usi
     eval_gate_ops: &mut VectorChain,
     eval_gate_ops_flag: &mut bool,
 ) {
-    // info!("eval_vanishing_poly_base_batch");
+    // debug!("eval_vanishing_poly_base_batch");
 
     let n = vars_batch.len();
 
@@ -47,7 +47,7 @@ pub fn eval_vanishing_poly_base_batch<F: RichField + Extendable<D>, const D: usi
     sys.mem
         .preload(addr_constraint_terms_batch, n * num_gate_constraints);
     if *eval_gate_ops_flag == false {
-        info!("get vec chain evaluate_gate_constraints_base_batch");
+        debug!("get vec chain evaluate_gate_constraints_base_batch");
         let vec_ops = evaluate_gate_constraints_base_batch::<F, D>(
             sys,
             common_data,
@@ -56,7 +56,7 @@ pub fn eval_vanishing_poly_base_batch<F: RichField + Extendable<D>, const D: usi
         );
         *eval_gate_ops = VectorChain::new(vec_ops, &sys.mem);
         *eval_gate_ops_flag = true;
-        info!("end vec chain evaluate_gate_constraints_base_batch");
+        debug!("end vec chain evaluate_gate_constraints_base_batch");
     }
     sys.run_once(eval_gate_ops);
     sys.mem.unpreload(vars_batch.addr_local_constants);
@@ -353,7 +353,7 @@ pub fn evaluate_gate_constraints_base_batch<F: RichField + Extendable<D>, const 
     vars_batch: EvaluationVarsBaseBatch,
     addr_constraints_batch: usize,
 ) -> Vec<VecOpConfig> {
-    info!("evaluate_gate_constraints_base_batch");
+    debug!("evaluate_gate_constraints_base_batch");
 
     let mut res = Vec::new();
     for (i, gate) in common_data.gates.iter().enumerate() {
@@ -379,7 +379,7 @@ pub fn evaluate_gate_constraints_base_batch<F: RichField + Extendable<D>, const 
                     addr_output: addr_group,
                     input_length: group_size,
                 },
-                unsafe { ENABLE_CONFIG.poly },
+                unsafe { ENABLE_CONFIG.other },
             );
             group_cp.drain.clear();
             group_cp.write_request.clear();

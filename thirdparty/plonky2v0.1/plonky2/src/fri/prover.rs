@@ -85,20 +85,20 @@ fn fri_committed_trees<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>,
             .map(|chunk: &[F::Extension]| flatten(chunk))
             .collect();
 
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         let tree = MerkleTree::<F, C::Hasher>::new(chunked_values, fri_params.config.cap_height);
-        let duration = start.elapsed();
-        println!("Merkle tree time: {:?}", duration.as_micros());
+        // let duration = start.elapsed();
+        // println!("Merkle tree time: {:?}", duration.as_micros());
 
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         challenger.observe_cap(&tree.cap);
-        let duration = start.elapsed();
-        println!("challenger time: {:?}", duration.as_nanos());
+        // let duration = start.elapsed();
+        // println!("challenger time: {:?}", duration.as_nanos());
         trees.push(tree);
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         let beta = challenger.get_extension_challenge::<D>();
-        let duration = start.elapsed();
-        println!("challenger time: {:?}", duration.as_nanos());
+        // let duration = start.elapsed();
+        // println!("challenger time: {:?}", duration.as_nanos());
         // P(x) = sum_{i<r} x^i * P_i(x^r) becomes sum_{i<r} beta^i * P_i(x).
         coeffs = PolynomialCoeffs::new(
             coeffs
@@ -108,10 +108,10 @@ fn fri_committed_trees<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>,
                 .collect::<Vec<_>>(),
         );
         shift = shift.exp_u64(arity as u64);
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         values = coeffs.coset_fft(shift.into());
-        let duration = start.elapsed();
-        println!("FFT time: {:?}", duration.as_micros());
+        // let duration = start.elapsed();
+        // println!("FFT time: {:?}", duration.as_micros());
     }
 
     // The coefficients being removed here should always be zero.
@@ -119,10 +119,10 @@ fn fri_committed_trees<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>,
         .coeffs
         .truncate(coeffs.len() >> fri_params.config.rate_bits);
 
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     challenger.observe_extension_elements(&coeffs.coeffs);
-    let duration = start.elapsed();
-    println!("challenger time: {:?}", duration.as_nanos());
+    // let duration = start.elapsed();
+    // println!("challenger time: {:?}", duration.as_nanos());
     (trees, coeffs)
 }
 
@@ -131,7 +131,7 @@ fn fri_proof_of_work<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, c
     challenger: &mut Challenger<F, C::Hasher>,
     config: &FriConfig,
 ) -> F {
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     let min_leading_zeros = config.proof_of_work_bits + (64 - F::order().bits()) as u32;
 
     // The easiest implementation would be repeatedly clone our Challenger. With each clone, we'd
@@ -175,8 +175,8 @@ fn fri_proof_of_work<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, c
     let pow_response = challenger.get_challenge();
     let leading_zeros = pow_response.to_canonical_u64().leading_zeros();
     assert!(leading_zeros >= min_leading_zeros);
-    let duration = start.elapsed();
-    println!("challenger time: {:?}", duration.as_nanos());
+    // let duration = start.elapsed();
+    // println!("challenger time: {:?}", duration.as_nanos());
     pow_witness
 }
 
@@ -191,10 +191,10 @@ fn fri_prover_query_rounds<
     n: usize,
     fri_params: &FriParams,
 ) -> Vec<FriQueryRound<F, C::Hasher, D>> {
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     let rnd = challenger.get_n_challenges(fri_params.config.num_query_rounds);
-    let duration = start.elapsed();
-    println!("challenger time: {:?}", duration.as_nanos());
+    // let duration = start.elapsed();
+    // println!("challenger time: {:?}", duration.as_nanos());
 
     rnd.into_par_iter()
         .map(|rand| {

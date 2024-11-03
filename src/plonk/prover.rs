@@ -1,4 +1,4 @@
-use log::info;
+use log::debug;
 use plonky2::field::extension::Extendable;
 use plonky2::field::types::Field;
 use plonky2::fri::FriParams;
@@ -39,9 +39,9 @@ pub fn prove_with_partition_witness<
     partition_witness: PartitionWitness<F>,
 ) {
     unsafe {
-        info!("ArchConfig is {:?}", ARCH_CONFIG);
+        debug!("ArchConfig is {:?}", ARCH_CONFIG);
     }
-    info!("Proving with partition witness");
+    debug!("Proving with partition witness");
 
     let config = &common_data.config;
     let num_challenges = config.num_challenges;
@@ -339,7 +339,7 @@ fn all_wires_permutation_partial_products(
     degree: usize,
     num_challenges: usize,
 ) {
-    info!("all_wires_permutation_partial_products");
+    debug!("all_wires_permutation_partial_products");
     (0..num_challenges).for_each(|i| {
         wires_permutation_partial_products_and_zs(
             sys,
@@ -372,7 +372,7 @@ pub fn wires_permutation_partial_products_and_zs(
     num_wires: usize,
     degree: usize,
 ) {
-    info!("wires_permutation_partial_products_and_zs");
+    debug!("wires_permutation_partial_products_and_zs");
 
     let num_routed_wires_quotient = ceil_div_usize(num_routed_wires, degree);
 
@@ -560,7 +560,7 @@ fn compute_quotient_polys<F: RichField + Extendable<D>, const D: usize>(
     addr_alphas: usize,
     addr_res: usize,
 ) {
-    info!("compute_quotient_polys");
+    debug!("compute_quotient_polys");
     let num_challenges = common_data.config.num_challenges;
     let rate_bits = common_data.config.fri_config.rate_bits;
     let degree_bits = common_data.degree_bits();
@@ -595,16 +595,16 @@ fn compute_quotient_polys<F: RichField + Extendable<D>, const D: usize>(
             addr_output: 0,
             input_length: num_routed_wires,
         },
-        unsafe { ENABLE_CONFIG.poly },
+        unsafe { ENABLE_CONFIG.other },
     );
     k_is_cp.drain.clear();
     k_is_cp.write_request.clear();
     sys.run_once(&k_is_cp);
 
-    info!("num_batches: {}", num_batches);
+    debug!("num_batches: {}", num_batches);
     for batch_i in 0..num_batches {
         if batch_i % 256 == 0 {
-            info!("batch_i: {}", batch_i);
+            debug!("batch_i: {}", batch_i);
         }
 
         sys.mem.preload(addr_k_is, num_routed_wires);
@@ -625,7 +625,7 @@ fn compute_quotient_polys<F: RichField + Extendable<D>, const D: usize>(
                 addr_output: addr_shifted_xs_batch,
                 input_length: xs_batch_len,
             },
-            unsafe { ENABLE_CONFIG.poly },
+            unsafe { ENABLE_CONFIG.other },
         );
         xs_batch_cp.drain.clear();
         mcks.push(xs_batch_cp);
@@ -858,7 +858,7 @@ fn batch_copy_transpose(batch_addr: &[(usize, usize)]) -> Vec<MemCpy> {
                     addr_output: 0,
                     input_length: width,
                 },
-                unsafe { ENABLE_CONFIG.poly },
+                unsafe { ENABLE_CONFIG.other },
             );
             mk.drain.clear();
             mk.write_request.clear();
@@ -960,7 +960,7 @@ pub fn fri_committed_trees<const D: usize>(
                 addr_output: addr_leaves,
                 input_length: num_leaves * leaf_length,
             },
-            unsafe { ENABLE_CONFIG.tree },
+            unsafe { ENABLE_CONFIG.hash },
         );
         mk.prefetch.clear();
         mk.read_request.clear();

@@ -1,4 +1,4 @@
-use log::info;
+use log::debug;
 use plonky2::gates::gate::GateRef;
 
 use crate::kernel::vector_operation::{VecOpConfig, VecOpExtension, VecOpSrc, VecOpType};
@@ -55,7 +55,7 @@ pub fn eval_filtered_base_batch<F: RichField + Extendable<D>, const D: usize>(
     vars_batch.addr_local_constants +=
         (num_selectors + num_lookup_selectors) * vars_batch.len() * SIZE_F;
 
-    info!("Gate: {:?}", gate.id());
+    debug!("Gate: {:?}", gate.id());
     if let Some(index) = gate.id().find("Gate") {
         let substring = &gate.id()[..index + 4];
         match substring {
@@ -235,7 +235,7 @@ pub fn eval_filtered_base_batch<F: RichField + Extendable<D>, const D: usize>(
     sys.mem.free("filters");
 
     let _duration = _start.elapsed();
-    // info!(
+    // debug!(
     //     "Time elapsed in eval_filtered_base_batch() is: {:?}",
     //     duration
     // );

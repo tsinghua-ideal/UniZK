@@ -78,7 +78,7 @@ pub fn prove<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: 
 
     let mut challenger = Challenger::<F, C::Hasher>::new();
 
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     // Observe the instance.
     challenger.observe_hash::<C::Hasher>(prover_data.circuit_digest);
     challenger.observe_hash::<C::InnerHasher>(public_inputs_hash);
@@ -86,8 +86,8 @@ pub fn prove<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: 
     challenger.observe_cap(&wires_commitment.merkle_tree.cap);
     let betas = challenger.get_n_challenges(num_challenges);
     let gammas = challenger.get_n_challenges(num_challenges);
-    let duration = start.elapsed();
-    println!("challenger time: {:?}", duration.as_nanos());
+    // let duration = start.elapsed();
+    // println!("challenger time: {:?}", duration.as_nanos());
 
     assert!(
         common_data.quotient_degree_factor < common_data.config.num_routed_wires,
@@ -119,12 +119,12 @@ pub fn prove<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: 
         )
     );
 
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     challenger.observe_cap(&partial_products_and_zs_commitment.merkle_tree.cap);
 
     let alphas = challenger.get_n_challenges(num_challenges);
-    let duration = start.elapsed();
-    println!("challenger time: {:?}", duration.as_nanos());
+    // let duration = start.elapsed();
+    // println!("challenger time: {:?}", duration.as_nanos());
 
     let quotient_polys = timed!(
         timing,
@@ -170,12 +170,12 @@ pub fn prove<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: 
         )
     );
 
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     challenger.observe_cap(&quotient_polys_commitment.merkle_tree.cap);
 
     let zeta = challenger.get_extension_challenge::<D>();
-    let duration = start.elapsed();
-    println!("challenger time: {:?}", duration.as_nanos());
+    // let duration = start.elapsed();
+    // println!("challenger time: {:?}", duration.as_nanos());
     // To avoid leaking witness data, we want to ensure that our opening locations, `zeta` and
     // `g * zeta`, are not in our subgroup `H`. It suffices to check `zeta` only, since
     // `(g * zeta)^n = zeta^n`, where `n` is the order of `g`.
@@ -198,10 +198,10 @@ pub fn prove<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: 
             common_data,
         )
     );
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     challenger.observe_openings(&openings.to_fri_openings());
-    let duration = start.elapsed();
-    println!("challenger time: {:?}", duration.as_nanos());
+    // let duration = start.elapsed();
+    // println!("challenger time: {:?}", duration.as_nanos());
 
     let opening_proof = timed!(
         timing,
@@ -230,7 +230,7 @@ pub fn prove<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: 
 
     let duration = time_start.elapsed();
     println!(
-        "prove_with_partition_witness took: {:?}",
+        "prove_with_partition_witness took: {:?} us",
         duration.as_micros()
     );
     println!("prove_with_partition_witness done");
@@ -321,13 +321,13 @@ fn wires_permutation_partial_products_and_zs<
         all_partial_products_and_zs.push(partial_products_and_z_gx);
     }
 
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     let res = transpose(&all_partial_products_and_zs)
         .into_par_iter()
         .map(PolynomialValues::new)
         .collect();
-    let duration = start.elapsed();
-    println!("transpose time: {:?}", duration.as_micros());
+    // let duration = start.elapsed();
+    // println!("transpose time: {:?}", duration.as_micros());
 
     res
 }
@@ -472,20 +472,20 @@ fn compute_quotient_polys<
         })
         .collect();
 
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     let tmp = transpose(&quotient_values)
         .into_par_iter()
         .map(PolynomialValues::new)
         .collect::<Vec<_>>();
-    let duration = start.elapsed();
-    println!("transpose time: {:?}", duration.as_micros());
+    // let duration = start.elapsed();
+    // println!("transpose time: {:?}", duration.as_micros());
 
-    let start = std::time::Instant::now();
+    // let start = std::time::Instant::now();
     let res = tmp
         .into_par_iter()
         .map(|values| values.coset_ifft(F::coset_shift()))
         .collect();
-    let duration = start.elapsed();
-    println!("FFT time: {:?}", duration.as_micros());
+    // let duration = start.elapsed();
+    // println!("FFT time: {:?}", duration.as_micros());
     res
 }

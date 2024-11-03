@@ -1,4 +1,4 @@
-use log::info;
+use log::debug;
 
 use crate::trace::trace::{Fetch, FetchType, Request};
 use crate::config::arch_config::ARCH_CONFIG;
@@ -88,7 +88,7 @@ impl Kernel for MemCpy {
         self.write_request.clone()
     }
     fn log(&self) {
-        info!("Kernel config: {:?}", self.config);
+        debug!("Kernel config: {:?}", self.config);
     }
     fn get_kernel_type(&self) -> String {
         String::from("Memcpy")

@@ -54,7 +54,6 @@ impl<const L: usize> TransformationCircuit<L> {
             inputs,
             &mut timing,
         )?;
-        timing.print();
 
         chunk_curcuit.circuit.verify(proof.clone())?;
 
@@ -116,7 +115,7 @@ impl<const L: usize> TransformationCircuit<L> {
         res
     }
 
-    pub fn prove(&mut self, original: &[u8], edited: &[u8]) -> Result<TransformationProof> {
+    pub fn prove(&mut self, original: &[u8], edited: &[u8]) {
         let original_elements = bytes_to_field64::<F>(original);
         let edited_elements = bytes_to_field64::<F>(edited);
 
@@ -125,7 +124,6 @@ impl<const L: usize> TransformationCircuit<L> {
             original.len(),
             original.len() / 1024
         );
-        let start = Instant::now();
 
         let mut orig_hasher = ChunkHasher::<F, D, L>::new(&original_elements);
         let mut edit_hasher = ChunkHasher::<F, D, L>::new(&edited_elements);
@@ -134,29 +132,10 @@ impl<const L: usize> TransformationCircuit<L> {
         for (chunk_circuit, pt, inner_data) in izip!(&self.chunk_circuits, &self.pts, &self.ids) {
             println!("Proving chunk...");
             let chunk_proof =
-                self.prove_chunk(&mut orig_hasher, &mut edit_hasher, chunk_circuit)?;
+                self.prove_chunk(&mut orig_hasher, &mut edit_hasher, chunk_circuit).unwrap();
             pw.set_proof_with_pis_target(&pt, &chunk_proof.proof);
             pw.set_verifier_data_target(&inner_data, &chunk_circuit.circuit.verifier_only);
         }
-
-        let mut timing = TimingTree::new("prove", Level::Debug);
-        let proof = prove(
-            &self.circuit.prover_only,
-            &self.circuit.common,
-            pw,
-            &mut timing,
-        )?;
-        timing.print();
-
-        let duration = start.elapsed();
-        println!("Total time for prove is: {:?}", duration);
-
-        Ok(TransformationProof {
-            proof: proof.compress(
-                &self.circuit.verifier_only.circuit_digest,
-                &self.circuit.common,
-            )?,
-        })
     }
 }
 

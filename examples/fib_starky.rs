@@ -3,15 +3,15 @@ use log::info;
 
 use plonky2::field::types::Field;
 use plonky2::plonk::config::{GenericConfig, PoseidonGoldilocksConfig};
+use starky::config::StarkConfig;
+use starky::fibonacci_stark::FibonacciStark;
 use unizk::config::RamConfig;
 use unizk::kernel::vector_operation::{VecOpConfig, VecOpSrc, VecOpType};
 use unizk::memory::memory_allocator::MemAlloc;
 use unizk::starky::constraint_consumer::ConstraintConsumer;
 use unizk::starky::stark::EvaluationFrame;
 use unizk::system::system::System;
-use unizk::util::{BATCH_SIZE, SIZE_F};
-use starky::config::StarkConfig;
-use starky::fibonacci_stark::FibonacciStark;
+use unizk::util::{set_config, BATCH_SIZE, SIZE_F};
 
 use unizk::starky::prover::prove;
 
@@ -123,9 +123,6 @@ fn main() {
         &public_inputs,
         eval_packed_generic,
     );
-
-    info!("Total number of mem reqs: {}", sys.ramsim.op_cnt);
-    info!("Total computations: {:?}", sys.get_computation());
 
     info!("Simulator finished");
     sys.ramsim.static_();

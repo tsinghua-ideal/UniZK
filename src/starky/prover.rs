@@ -267,7 +267,7 @@ fn compute_quotient_polys<F, S, const D: usize>(
                 addr_output: addr_lagrange_basis_first,
                 input_length: BATCH_SIZE,
             },
-            unsafe { ENABLE_CONFIG.poly },
+            unsafe { ENABLE_CONFIG.other },
         ));
         mks.push(MemCpy::new(
             MemCpyConfig {
@@ -275,7 +275,7 @@ fn compute_quotient_polys<F, S, const D: usize>(
                 addr_output: addr_lagrange_basis_last,
                 input_length: BATCH_SIZE,
             },
-            unsafe { ENABLE_CONFIG.poly },
+            unsafe { ENABLE_CONFIG.other },
         ));
         sys.mem.preload(addr_lagrange_basis_first, BATCH_SIZE);
         sys.mem.preload(addr_lagrange_basis_last, BATCH_SIZE);
@@ -317,7 +317,7 @@ fn compute_quotient_polys<F, S, const D: usize>(
                     addr_output: addr_v_i,
                     input_length: *len,
                 };
-                let mk = MemCpy::new(config, unsafe { ENABLE_CONFIG.poly });
+                let mk = MemCpy::new(config, unsafe { ENABLE_CONFIG.other });
                 mks.push(mk);
             }
         };

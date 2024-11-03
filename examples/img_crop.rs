@@ -1,6 +1,7 @@
 use env_logger::Env;
 use image::imageops::crop;
 use log::info;
+use unizk::util::set_config;
 use zkedit_zkp::builder::TransformationCircuitBuilder;
 use zkedit_zkp::zk_transformations::Transformation;
 
@@ -52,83 +53,10 @@ fn align_crop_edit(
 const L: usize = 12 * 85 * 256 * 8;
 
 fn main() {
-    let args = Command::new("simulator_v2")
-        .version("1.0")
-        .about("Demonstrates command line argument parsing")
-        .arg(
-            Arg::new("ram")
-                .short('r')
-                .long("ram")
-                .default_value("8")
-                .value_parser(value_parser!(usize)),
-        )
-        .arg(
-            Arg::new("tiles")
-                .short('t')
-                .long("tiles")
-                .default_value("32")
-                .value_parser(value_parser!(usize)),
-        )
-        .arg(
-            Arg::new("enable")
-                .short('e')
-                .long("enable")
-                .default_value("-1")
-                .value_parser(value_parser!(i32)),
-        )
-        .arg(
-            Arg::new("ram kb")
-                .long("rk")
-                .default_value("-1")
-                .value_parser(value_parser!(i32)),
-        )
-        .get_matches();
-    let ram_size: &usize = args.get_one::<usize>("ram").unwrap();
-    let tiles: &usize = args.get_one::<usize>("tiles").unwrap();
-    let enable: &i32 = args.get_one::<i32>("enable").unwrap();
-    let ram_kb: &i32 = args.get_one::<i32>("ram kb").unwrap();
-
-    unsafe {
-        ARCH_CONFIG.rdbuf_sz_kb = ram_size * 1024 / 2;
-        ARCH_CONFIG.wrbuf_sz_kb = ram_size * 1024 / 2;
-        ARCH_CONFIG.num_tiles = *tiles;
-        if *ram_kb >= 0 {
-            ARCH_CONFIG.rdbuf_sz_kb = (ram_kb / 2) as usize;
-            ARCH_CONFIG.wrbuf_sz_kb = (ram_kb / 2) as usize;
-        }
-
-        if *enable >= 0 {
-            ENABLE_CONFIG.fft = false;
-            ENABLE_CONFIG.transpose = false;
-            ENABLE_CONFIG.tree = false;
-            ENABLE_CONFIG.poly = false;
-            ENABLE_CONFIG.hash = false;
-            match enable {
-                0 => {
-                    ENABLE_CONFIG.fft = true;
-                }
-                1 => {
-                    ENABLE_CONFIG.tree = true;
-                }
-                2 => {
-                    ENABLE_CONFIG.poly = true;
-                }
-                _ => {
-                    panic!("Invalid enable option")
-                }
-            }
-        }
-    }
-    let kernel_name = match enable {
-        -1 => "",
-        0 => "_fft",
-        1 => "_tree",
-        2 => "_poly",
-        _ => panic!("Invalid enable option"),
-    };
+    set_config();
 
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
-    let ramsim = RamConfig::new(&format!("{}{}", "crop", kernel_name));
+    let ramsim = RamConfig::new(&format!("{}", "crop"));
     // ramsim.txt_output = true;
     let mem = MemAlloc::new(256, 4096);
     let mut sys = System::new(mem, ramsim);

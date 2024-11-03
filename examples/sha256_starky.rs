@@ -2984,9 +2984,6 @@ fn main() {
     let stark = S::new();
     prove::<F, C, S, D>(&mut sys, stark, &config, trace, &[], eval_packed_generic);
 
-    info!("Total number of mem reqs: {}", sys.ramsim.op_cnt);
-    info!("Total computations: {:?}", sys.get_computation());
-
     info!("Simulator finished");
     sys.ramsim.static_();
 

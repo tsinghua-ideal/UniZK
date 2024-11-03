@@ -2,13 +2,14 @@ This is the simulator for UniZK, an accelerator for  Zero-Knowledge Proof with u
 
 ## Thirdparty
 The codes of the following third-party libraries are sourced from:
-- imgcrop: <https://github.com/ChickenLover/plonky2-zkedit>
-- plonky2: <https://github.com/0xPolygonZero/plonky2>
-- proto-neural-zkp: <https://github.com/worldcoin/proto-neural-zkp>
-- ramsim: RamSim is an enhanced version of Ramulator2, adding support for simulating computation latency and data dependencies. Most of its source code is derived from <https://github.com/CMU-SAFARI/ramulator2>.
-
-- sha256: <https://github.com/polymerdao/plonky2-sha256>
-- sha256-starky: <https://github.com/tumberger/plonky2/tree/sha256-starky>
+- ecdsa: <https://github.com/0xPolygonZero/plonky2-ecdsa/tree/bdb6504bca250db1548cdcce2407d4e334990c33>
+- imgcrop: <https://github.com/ChickenLover/plonky2-zkedit/tree/d20567361bd405716f6736a88dc263978f267d62>
+- plonky2: <https://github.com/0xPolygonZero/plonky2/tree/30b47998262642be54da5acf03dfca31af4d93f7>
+- plonky2v0.1: <https://github.com/polymerdao/plonky2/tree/4cb0b48df1d227d5461a4c28ed025aaea64e2e62>
+- proto-neural-zkp: <https://github.com/worldcoin/proto-neural-zkp/tree/b2b514ac0857fd5e1cb5da9399fcd6020b1730e3>
+- ramsim: RamSim is an enhanced version of Ramulator2, adding support for simulating computation latency and data dependencies. Most of its source code is derived from <https://github.com/CMU-SAFARI/ramulator2/tree/b7c70275f04126c647edb989270cc429776955d1>.
+- sha256: <https://github.com/polymerdao/plonky2-sha256/tree/06d128e78ed8d29b21d58294b069e852c1866f8d>
+- sha256-starky: <https://github.com/tumberger/plonky2/tree/474ed82c385b446f89bc18e648b5ad7d5d94ce06>
 
 We appreciate the contributions of these open-source authors.
 
@@ -31,10 +32,14 @@ cd build
 cmake ..
 make -j
 ```
+### Run tests on CPU
+```
+./run_cpu_test.sh
+```
+
 ### Run tests for plonky2
 ```
 ./run_plonky2_test.sh
-./run_plonky2_test_2.sh
 ```
 ### Run tests for starky and recursive proof
 ```
@@ -43,5 +48,9 @@ make -j
 
 A log file with the name of the application, such as “sha256.log”, will appear in the folder with the simulation results.
 
-## Hint
+## Notes
+### Disk space
 Trace files can take up a lot of disk space. Ensure you have enough space when testing large applications and remember to clean up the files after testing!
+
+### GPU
+The GPU performance can be evaluated using the GPU implementation of Plonky2 (available at <https://github.com/sideprotocol/plonky2-gpu>) with our CPU-based application code located in the `examples` directory.

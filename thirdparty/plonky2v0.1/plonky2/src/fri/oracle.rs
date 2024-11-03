@@ -48,14 +48,14 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
         timing: &mut TimingTree,
         fft_root_table: Option<&FftRootTable<F>>,
     ) -> Self {
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         let coeffs = timed!(
             timing,
             "IFFT",
             values.into_par_iter().map(|v| v.ifft()).collect::<Vec<_>>()
         );
-        let duration = start.elapsed();
-        println!("FFT time: {:?}", duration.as_micros());
+        // let duration = start.elapsed();
+        // println!("FFT time: {:?}", duration.as_micros());
 
         Self::from_coeffs(
             coeffs,
@@ -83,20 +83,20 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
             Self::lde_values(&polynomials, rate_bits, blinding, fft_root_table)
         );
 
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         let mut leaves = timed!(timing, "transpose LDEs", transpose(&lde_values));
-        let duration = start.elapsed();
-        println!("transpose time: {:?}", duration.as_micros());
+        // let duration = start.elapsed();
+        // println!("transpose time: {:?}", duration.as_micros());
         reverse_index_bits_in_place(&mut leaves);
 
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         let merkle_tree = timed!(
             timing,
             "build Merkle tree",
             MerkleTree::new(leaves, cap_height)
         );
-        let duration = start.elapsed();
-        println!("Merkle tree time: {:?}", duration.as_micros());
+        // let duration = start.elapsed();
+        // println!("Merkle tree time: {:?}", duration.as_micros());
 
         Self {
             polynomials,
@@ -118,7 +118,7 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
         // If blinding, salt with two random elements to each leaf vector.
         let salt_size = if blinding { SALT_SIZE } else { 0 };
 
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         let res = polynomials
             .par_iter()
             .map(|p| {
@@ -133,8 +133,8 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
                     .map(|_| F::rand_vec(degree << rate_bits)),
             )
             .collect();
-        let duration = start.elapsed();
-        println!("FFT time: {:?}", duration.as_micros());
+        // let duration = start.elapsed();
+        // println!("FFT time: {:?}", duration.as_micros());
         res
     }
 
@@ -181,10 +181,10 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
         timing: &mut TimingTree,
     ) -> FriProof<F, C::Hasher, D> {
         assert!(D > 1, "Not implemented for D=1.");
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         let alpha = challenger.get_extension_challenge::<D>();
-        let duration = start.elapsed();
-        println!("challenge time: {:?}", duration.as_nanos());
+        // let duration = start.elapsed();
+        // println!("challenge time: {:?}", duration.as_nanos());
         let mut alpha = ReducingFactor::new(alpha);
 
         // Final low-degree polynomial that goes into FRI.
@@ -216,14 +216,14 @@ impl<F: RichField + Extendable<D>, C: GenericConfig<D, F = F>, const D: usize>
         final_poly.coeffs.insert(0, F::Extension::ZERO);
 
         let lde_final_poly = final_poly.lde(fri_params.config.rate_bits);
-        let start = std::time::Instant::now();
+        // let start = std::time::Instant::now();
         let lde_final_values = timed!(
             timing,
             &format!("perform final FFT {}", lde_final_poly.len()),
             lde_final_poly.coset_fft(F::coset_shift().into())
         );
-        let duration = start.elapsed();
-        println!("FFT time: {:?}", duration.as_micros());
+        // let duration = start.elapsed();
+        // println!("FFT time: {:?}", duration.as_micros());
 
         let fri_proof = fri_proof::<F, C, D>(
             &oracles

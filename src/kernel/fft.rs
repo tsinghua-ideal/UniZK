@@ -1,11 +1,11 @@
-use log::info;
+use log::debug;
 use num::integer::Roots;
 use plonky2::util::{log2_ceil, log2_strict};
 
-use crate::trace::trace::{Fetch, FetchType, Request};
 use crate::config::arch_config::ARCH_CONFIG;
 use crate::config::enable_config::ENABLE_CONFIG;
 use crate::kernel::kernel::Kernel;
+use crate::trace::trace::{Fetch, FetchType, Request};
 use crate::util::{bit_reverse, ceil_div_usize, D, SIZE_F};
 use plonky2::field::goldilocks_field::GoldilocksField as F;
 use plonky2::field::types::Field;
@@ -137,11 +137,7 @@ impl Kernel for Fft {
                 let num_planes = ntt_length / plane_length / plane_height;
                 let plane_step = (self.config.get_num_planes() / para_k).min(num_planes);
                 let kernel_step = self.config.get_num_planes() / plane_step;
-                // info!(
-                //     "self.config.get_num_planes(): {}",
-                //     self.config.get_num_planes()
-                // );
-                // info!("plane_step: {}, kernel_step: {}", plane_step, kernel_step);
+
                 for kernel_chunk in (0..self.config.k).step_by(kernel_step) {
                     let mut idx = Vec::new();
                     for plane_chunk in (0..num_planes).step_by(plane_step) {
@@ -634,7 +630,7 @@ impl Kernel for Fft {
         self.write_request.clone()
     }
     fn log(&self) {
-        info!("Fft Kernel config: {:?}", self.config);
+        debug!("Fft Kernel config: {:?}", self.config);
     }
 
     fn get_computation(&self) -> usize {
@@ -798,9 +794,7 @@ pub fn fft(input: &Vec<F>, inverse: bool, reverse: bool) -> Vec<F> {
         mid = mid * 2;
     }
     if inverse {
-        let inv = F::from_canonical_u64(length as u64)
-            .try_inverse()
-            .unwrap();
+        let inv = F::from_canonical_u64(length as u64).try_inverse().unwrap();
         for i in 0..length {
             a[i] = a[i] * inv;
         }

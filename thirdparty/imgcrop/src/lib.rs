@@ -5,6 +5,7 @@ pub mod proof;
 pub mod transformations;
 pub mod util;
 pub mod zk_transformations;
+pub mod img_crop_lib;
 
 use plonky2::plonk::config::{GenericConfig, PoseidonGoldilocksConfig};
 

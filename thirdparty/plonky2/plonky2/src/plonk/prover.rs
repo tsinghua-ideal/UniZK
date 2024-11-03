@@ -125,7 +125,14 @@ where
         generate_partial_witness(inputs, prover_data, common_data)
     );
 
-    prove_with_partition_witness(prover_data, common_data, partition_witness, timing)
+    let time_start = std::time::Instant::now();
+    let res = prove_with_partition_witness(prover_data, common_data, partition_witness, timing);
+    let duration = time_start.elapsed();
+    println!(
+        "prove_with_partition_witness took: {:?} us",
+        duration.as_micros()
+    );
+    res
 }
 
 pub fn prove_with_partition_witness<

@@ -1,4 +1,4 @@
-use log::info;
+use log::debug;
 use plonky2::field::extension::Extendable;
 use plonky2::fri::structure::{FriBatchInfo, FriInstanceInfo};
 use plonky2::fri::FriParams;
@@ -44,7 +44,7 @@ impl PolynomialBatch {
         transposed_input: bool,
         merged_input: Vec<MemCpy>,
     ) -> Self {
-        info!("commitment: {:?}", name);
+        debug!("commitment: {:?}", name);
         let salt_size = if blinding { SALT_SIZE } else { 0 };
 
         let salt_id = format!("{}{}", "salt_poly_cpu", name);
@@ -345,7 +345,7 @@ impl PolynomialBatch {
         addr_zeta: usize,
         addr_zeta_g: usize,
     ) {
-        info!("prove_openings");
+        debug!("prove_openings");
         let addr_alpha = sys.mem.alloc("alpha", D * SIZE_F).unwrap();
         challenger.get_extension_challenge::<D>(sys, addr_alpha);
         let mut alpha = ReducingFactor::new(addr_alpha);
@@ -505,7 +505,7 @@ impl PolynomialBatch {
                     addr_output: addr_proof + i * Tree::DIGEST_LENGTH * SIZE_F,
                     input_length: Tree::DIGEST_LENGTH,
                 },
-                unsafe { ENABLE_CONFIG.tree },
+                unsafe { ENABLE_CONFIG.hash },
             ));
         }
         res

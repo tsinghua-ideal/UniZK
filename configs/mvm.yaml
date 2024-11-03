@@ -1,7 +1,7 @@
 Frontend:
   impl: TraceGen
   clock_ratio: 10
-  traceFileName: ./traces/mvm_8_32.bin
+  traceFileName: ./traces/mvm.bin
   Frontend:
     impl: RamSim
     maxPendEntry: 16

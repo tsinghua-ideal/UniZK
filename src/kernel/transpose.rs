@@ -1,4 +1,4 @@
-use log::info;
+use log::debug;
 use plonky2::util::log2_strict;
 
 use crate::trace::trace::{Fetch, FetchType, Request};
@@ -127,7 +127,7 @@ impl Kernel for Transpose {
         self.write_request.clone()
     }
     fn log(&self) {
-        info!("Kernel config: {:?}", self.config);
+        debug!("Kernel config: {:?}", self.config);
     }
     fn get_kernel_type(&self) -> String {
         String::from("Transpose")
@@ -160,7 +160,7 @@ impl Transpose {
             write_request: Request::new(),
             read_request: Request::new(),
         };
-        if unsafe { ENABLE_CONFIG.transpose } {
+        if unsafe { ENABLE_CONFIG.other } {
             k.init();
         }
         k

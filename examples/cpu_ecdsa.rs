@@ -68,7 +68,7 @@ fn main() -> Result<()> {
     builder.try_init()?;
 
     // Run the benchmark
-    let num_cpus = 1; //num_cpus::get();
+    let num_cpus = num_cpus::get();
     let threads = num_cpus;
     println!("Number of CPUs: {}", num_cpus);
     rayon::ThreadPoolBuilder::new()

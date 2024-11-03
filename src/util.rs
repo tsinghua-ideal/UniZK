@@ -1,3 +1,7 @@
+use crate::config::{arch_config::ARCH_CONFIG, enable_config::ENABLE_CONFIG};
+use clap::{value_parser, Arg, Command};
+use log::info;
+
 pub const SIZE_F: usize = 8;
 pub const SPONGE_RATE: usize = 8;
 pub const SPONGE_CAPACITY: usize = 4;
@@ -44,4 +48,60 @@ pub fn log2(x: usize) -> usize {
         y += 1;
     }
     y - 1
+}
+
+pub fn set_config() {
+    let args = Command::new("simulator_v2")
+        .version("1.0")
+        .about("Demonstrates command line argument parsing")
+        .arg(
+            Arg::new("ram")
+                .short('r')
+                .long("ram")
+                .default_value("8")
+                .value_parser(value_parser!(usize)),
+        )
+        .arg(
+            Arg::new("tiles")
+                .short('t')
+                .long("tiles")
+                .default_value("32")
+                .value_parser(value_parser!(usize)),
+        )
+        .arg(
+            Arg::new("enable")
+                .short('e')
+                .long("enable")
+                .default_value("-1")
+                .value_parser(value_parser!(i32)),
+        )
+        .get_matches();
+    let ram_size: &usize = args.get_one::<usize>("ram").unwrap();
+    let tiles: &usize = args.get_one::<usize>("tiles").unwrap();
+    let enable: &i32 = args.get_one::<i32>("enable").unwrap();
+
+    unsafe {
+        ARCH_CONFIG.rdbuf_sz_kb = ram_size * 1024 / 2;
+        ARCH_CONFIG.wrbuf_sz_kb = ram_size * 1024 / 2;
+        ARCH_CONFIG.num_tiles = *tiles;
+
+        if *enable >= 0 {
+            ENABLE_CONFIG.fft = false;
+            ENABLE_CONFIG.hash = false;
+            ENABLE_CONFIG.other = false;
+            match enable {
+                0 => {
+                    ENABLE_CONFIG.fft = true;
+                }
+                1 => {
+                    ENABLE_CONFIG.hash = true;
+                }
+                _ => {
+                    panic!("Invalid enable option")
+                }
+            }
+        }
+
+        println!("ARCH_CONFIG: {:?}", ARCH_CONFIG);
+    }
 }

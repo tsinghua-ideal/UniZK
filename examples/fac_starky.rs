@@ -111,9 +111,6 @@ fn main() {
         eval_packed_generic,
     );
 
-    info!("Total number of mem reqs: {}", sys.ramsim.op_cnt);
-    info!("Total computations: {:?}", sys.get_computation());
-
     info!("Simulator finished");
     sys.ramsim.static_();
 

@@ -42,6 +42,7 @@ where
     C: GenericConfig<D, F = F>,
     S: Stark<F, D>,
 {
+    let time_start = std::time::Instant::now();
     let degree = trace_poly_values[0].len();
     let degree_bits = log2_strict(degree);
     let fri_params = config.fri_params(degree_bits);
@@ -183,6 +184,11 @@ where
         openings,
         opening_proof,
     };
+    let duration = time_start.elapsed();
+    println!(
+        "prove took: {:?} us",
+        duration.as_micros()
+    );
 
     Ok(StarkProofWithPublicInputs {
         proof,

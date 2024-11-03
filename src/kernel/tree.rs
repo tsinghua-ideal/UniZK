@@ -1,7 +1,7 @@
 use std::cmp::min;
 use std::vec;
 
-use log::info;
+use log::debug;
 
 use crate::trace::trace::{Fetch, FetchType, Request};
 use crate::config::arch_config::ARCH_CONFIG;
@@ -352,7 +352,7 @@ impl Kernel for Tree {
         self.write_request.clone()
     }
     fn log(&self) {
-        info!("Tree Kernel config: {:?}", self.config);
+        debug!("Tree Kernel config: {:?}", self.config);
     }
     fn get_kernel_type(&self) -> String {
         String::from("Tree")
@@ -382,7 +382,7 @@ impl Tree {
         };
 
         k.log();
-        if unsafe { ENABLE_CONFIG.tree } {
+        if unsafe { ENABLE_CONFIG.hash } {
             k.init();
         }
         k

@@ -152,9 +152,6 @@ fn recursive_proof<
     let partition_witness = generate_partial_witness(pw, &data.prover_only, &data.common);
     prove_with_partition_witness(&mut sys, &data.prover_only, &data.common, partition_witness);
 
-    info!("Total number of mem reqs: {}", sys.ramsim.op_cnt);
-    info!("Total computations: {:?}", sys.get_computation());
-
     info!("Simulator finished");
     sys.ramsim.static_();
 

@@ -62,7 +62,7 @@ impl<const D: usize> StarkOpeningSet<D> {
                                 addr_output: 0,
                                 input_length: i_len,
                             },
-                            unsafe { ENABLE_CONFIG.poly },
+                            unsafe { ENABLE_CONFIG.other },
                         );
                         m.drain.clear();
                         m.write_request.clear();

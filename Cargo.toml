@@ -7,6 +7,7 @@ edition = "2021"
 
 [dependencies]
 plonky2 = {path = "./thirdparty/plonky2/plonky2"}
+plonky2_maybe_rayon = { path = "./thirdparty/plonky2/maybe_rayon" }
 starky = {path = "./thirdparty/plonky2/starky"}
 num = { version = "0.4", default-features = false, features = ["rand"] }
 rand = "0.8"
@@ -15,3 +16,5 @@ env_logger = "0.9"
 anyhow = { version = "1.0.40", default-features = false }
 neural-zkp = { path = "./thirdparty/proto-neural-zkp"}
 clap = "4.1.8"
+num_cpus = { version = "1.14.0", default-features = false }
+bytesize = "1.1.0"
