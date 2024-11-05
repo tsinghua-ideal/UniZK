@@ -162,7 +162,7 @@ fn verify(edited_image_path: String, metadata_path: String) -> Result<()> {
 }
 
 fn main() -> Result<()> {
-    let options = parse_options()?;
+    // let options = parse_options()?;
 
     let mut builder = env_logger::Builder::from_default_env();
     builder.format_timestamp(None);
@@ -185,19 +185,8 @@ fn main() -> Result<()> {
             );
             // Run the benchmark. `options.lookup_type` determines which benchmark to run.
 
-            match options {
-                Zkedit::Prove {
-                    orig_img_path,
-                    crop_x,
-                    crop_y,
-                    crop_w,
-                    crop_h,
-                } => prove_crop(orig_img_path, crop_x, crop_y, crop_w, crop_h),
-                Zkedit::Verify {
-                    edited_image_path,
-                    metadata_path,
-                } => verify(edited_image_path, metadata_path),
-            }
+            let im_path = "./random_color.png".to_string();
+            prove_crop(im_path, 55, 30, 512, 512)
         })?;
     Ok(())
 }
