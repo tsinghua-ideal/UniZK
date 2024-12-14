@@ -138,7 +138,6 @@ impl System {
         }
     }
 
-    /// carefully use, only when kernels in vector are all small
     pub fn run_once<K: Kernel>(&mut self, kernel: &K) {
         //add computation to self.computation
         let comp = self

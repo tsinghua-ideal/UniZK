@@ -15,9 +15,25 @@ We appreciate the contributions of these open-source authors.
 
 ## How to get started
 ### Prerequiste
+- A recent Linux distribution (recommended: Ubuntu 22.04)
 - rust 1.80
 - g++ 11.4
 - cmake 3.22
+
+### Configure the environment
+The `dependency.sh` script will install the necessary tools: g++, cmake, and Rust. To run it, use the following command:
+
+```
+./dependency.sh
+```
+
+If you want to run UniZK in a Docker container, the `docker.sh` script will automatically create and start a new container and configure the requirements. Use this command:
+
+```
+./docker.sh
+```
+
+The files of the project will be copied into `/UniZK` within the container.
 
 ### Use a nightly toolchain for Plonky2
 ```

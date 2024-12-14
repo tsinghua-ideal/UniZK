@@ -1,14 +1,15 @@
 use std::cmp::{max, min};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
-use crate::trace::trace::{Fetch, FetchType, Request};
 use crate::config::arch_config::ARCH_CONFIG;
 use crate::config::enable_config::ENABLE_CONFIG;
 use crate::kernel::vector_operation::VecOpConfig;
 use crate::memory::memory_allocator::MemAlloc;
+use crate::trace::trace::{Fetch, FetchType, Request};
 use crate::util::SIZE_F;
 
 use super::kernel::Kernel;
+use super::lru::LRUcache;
 use super::vector_operation::VecOpSrc;
 
 const NUM_VEC_REGS: usize = 4;
@@ -291,7 +292,7 @@ impl Convoy {
 #[derive(Clone)]
 pub struct VectorChain {
     vec_ops: Vec<VecOpConfig>,
-    vec_op_segs: Vec<Vec<usize>>,
+    convoys: Vec<Convoy>,
     pub prefetch: Fetch,
     pub read_request: Request,
     pub write_request: Request,
@@ -302,83 +303,69 @@ pub struct VectorChain {
 
 impl Kernel for VectorChain {
     fn create_prefetch(&mut self) {
-        // println!("num_elems: {:?}", unsafe { ARCH_CONFIG.num_elems() });
-        // println!("num_preload_elems: {:?}", self.num_preload_elems);
         let elems_capacity = unsafe { ARCH_CONFIG.num_elems() * 2 - self.num_preload_elems };
+        let mut lru = LRUcache::new(elems_capacity);
 
-        let mut elems_set: HashMap<usize, (bool, bool)> = HashMap::new();
-        let get_elems_to_insert =
-            |addr: usize, size: usize, d: bool, elems_set: &mut HashMap<usize, (bool, bool)>| {
-                let mut res = HashSet::new();
-                if addr == 0 {
-                    return res;
-                }
-                for i in 0..size {
-                    let addr_ = addr + i * SIZE_F;
-                    let set_contains = elems_set.contains_key(&addr_);
-                    if !set_contains {
-                        res.insert((addr_, !d, d));
+        let mut out_tag = HashMap::<usize, bool>::new();
+
+        for (i, c) in self.convoys.iter().enumerate() {
+            let mut prefetch = Vec::new();
+            let mut drain = Vec::new();
+            for vo in c.vec_ops.iter() {
+                for offset in (0..vo.vector_length).step_by(lru.get_capacity() / 4) {
+                    let vl = min(lru.get_capacity() / 4, vo.vector_length - offset);
+                    let addr_output = vo.addr_output + offset * SIZE_F;
+                    let addr_input_0 = vo.addr_input_0 + offset * SIZE_F;
+                    let addr_input_1 = vo.addr_input_1 + offset * SIZE_F;
+
+                    if addr_output != 0 {
+                        out_tag.insert(addr_output, true);
                     }
-                    if d && set_contains {
-                        if let Some(tag) = elems_set.get_mut(&addr_) {
-                            tag.1 = true;
+                    for (j, addr) in [addr_input_0, addr_input_1, addr_output]
+                        .iter()
+                        .enumerate()
+                        .filter(|&(_, x)| *x != 0)
+                    {
+                        let (load, evicted) = lru.put(*addr, vl, j == 2);
+                        for (addr, size) in load {
+                            let elems = (0..size).map(|x| addr + x * SIZE_F).collect();
+                            prefetch.push(elems);
+                        }
+                        for (addr, size) in evicted {
+                            if let Some(true) = out_tag.get(&addr) {
+                                let elems = (0..size).map(|x| addr + x * SIZE_F).collect();
+                                drain.push(elems);
+                                out_tag.remove(&addr);
+                            }
                         }
                     }
                 }
-                res
-            };
-        let mut vec_op_seg = Vec::new();
+            }
 
-        let mut update_self = |elems_set: &mut HashMap<usize, (bool, bool)>,
-                               vec_op_seg: &mut Vec<usize>| {
-            let elems_p = elems_set
-                .iter()
-                .filter(|(_, tag)| tag.0)
-                .map(|(addr, _)| *addr)
-                .collect();
-            let elems_d = elems_set
-                .iter()
-                .filter(|(_, tag)| tag.1)
-                .map(|(addr, _)| *addr)
-                .collect();
-            self.prefetch.push(vec![elems_p]);
-            self.drain.push(vec![elems_d]);
-            elems_set.clear();
-
-            self.vec_op_segs.push(vec_op_seg.clone());
-            vec_op_seg.clear();
-        };
-
-        for (i, vo) in self.vec_ops.iter().enumerate() {
-            let in0 = get_elems_to_insert(vo.addr_input_0, vo.vector_length, false, &mut elems_set);
-            let in1 = match vo.op_src {
-                VecOpSrc::VV => {
-                    get_elems_to_insert(vo.addr_input_1, vo.vector_length, false, &mut elems_set)
+            if i == self.convoys.len() - 1 {
+                for (addr, size) in lru.drain() {
+                    if let Some(true) = out_tag.get(&addr) {
+                        let elems = (0..size).map(|x| addr + x * SIZE_F).collect();
+                        drain.push(elems);
+                        out_tag.remove(&addr);
+                    }
                 }
-                _ => get_elems_to_insert(vo.addr_input_1, 1, false, &mut elems_set),
-            };
-            let out = get_elems_to_insert(vo.addr_output, vo.vector_length, true, &mut elems_set);
-            if elems_set.len() + in0.len() + in1.len() + out.len() > elems_capacity {
-                update_self(&mut elems_set, &mut vec_op_seg);
             }
-            for e in in0.iter().chain(in1.iter()).chain(out.iter()) {
-                elems_set.insert(e.0, (e.1, e.2));
-            }
-            vec_op_seg.push(i);
+
+            self.prefetch.push(prefetch);
+            self.drain.push(drain);
         }
-        if !elems_set.is_empty() {
-            assert!(vec_op_seg.len() > 0);
-            update_self(&mut elems_set, &mut vec_op_seg);
-        }
+
+        assert!(out_tag.is_empty());
 
         self.prefetch.mergable = true;
         self.prefetch.delay = vec![0; self.prefetch.len()];
         self.prefetch.interval = 0.0;
         self.drain.mergable = true;
         self.drain.delay = self
-            .vec_op_segs
+            .convoys
             .iter()
-            .map(|x| x.iter().map(|y| self.vec_ops[*y].delay()).sum())
+            .map(|c| c.num_vec_mul() * 2 + c.num_vec_add_or_sub())
             .collect();
         self.drain.interval = 1.0;
     }
@@ -404,7 +391,7 @@ impl Kernel for VectorChain {
         self.write_request.clone()
     }
     fn log(&self) {
-        // debug!("VectorChain: {:?}", self.vec_ops);
+        // info!("VectorChain: {:?}", self.vec_ops);
     }
     fn get_kernel_type(&self) -> String {
         String::from("Vector")
@@ -437,9 +424,11 @@ impl VectorChain {
                 y
             })
             .collect::<Vec<_>>();
+
+        let convoys = vector_chaining(&vec_ops_addr);
         let mut k = VectorChain {
             vec_ops: vec_ops_addr,
-            vec_op_segs: Vec::new(),
+            convoys,
             prefetch: Fetch::new(FetchType::Read),
             read_request: Request::new(),
             write_request: Request::new(),
@@ -451,23 +440,18 @@ impl VectorChain {
             return k;
         }
 
+        let read_segments = get_prefetch_segments(&k.convoys);
+        let write_segments = get_drain_segments(&k.convoys);
+
         k.create_prefetch();
-        k.create_drain();
         k.vec_ops = vec_ops;
 
-        for vec_op_seg_idx in k.vec_op_segs.iter() {
-            let vec_op_seg = vec_op_seg_idx
-                .iter()
-                .map(|x| k.vec_ops[*x].clone())
-                .collect();
-            let convoys = vector_chaining(&vec_op_seg);
-            let read_segments = get_prefetch_segments(&convoys);
-            let write_segments = get_drain_segments(&convoys);
-            let read_lines = get_request_lines(read_segments);
-            let write_lines = get_request_lines(write_segments);
+        for rl in read_segments.iter() {
+            k.read_request.push(get_request_lines(vec![rl.clone()]));
+        }
 
-            k.read_request.push(read_lines);
-            k.write_request.push(write_lines);
+        for wl in write_segments.iter() {
+            k.write_request.push(get_request_lines(vec![wl.clone()]));
         }
 
         k
